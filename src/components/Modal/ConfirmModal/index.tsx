@@ -1,5 +1,6 @@
 import useGlobalModalStore, { ModalType } from "@/store/modal";
 import BaseModal from "../BaseModal";
+import Button from "@/components/atoms/Button";
 
 export interface ConfirmModalProps {
   text?: string;
@@ -25,19 +26,21 @@ const ConfirmModal = ({
         <div className="text-black text-xl mb-8 font-bold break-keep whitespace-pre-wrap">
           {text}
         </div>
-        <div className="w-full flex justify-around">
-          <button
-            className="text-black border px-10 py-2 rounded-lg"
+        <div className="w-full flex justify-around gap-8">
+          <Button
+            style="text-black border hover:bg-gray-100 active:bg-gray-200 transition-all flex-1"
+            isClickEffect={false}
             onClick={onCancel ?? hideGlobalModal}
           >
             취소
-          </button>
-          <button
-            className="text-black border px-10 py-2 rounded-lg"
+          </Button>
+          <Button
+            style="text-black border hover:bg-gray-100 active:bg-gray-200 transition-all flex-1"
+            isClickEffect={false}
             onClick={onConfirm}
           >
             확인
-          </button>
+          </Button>
         </div>
       </div>
     </BaseModal>

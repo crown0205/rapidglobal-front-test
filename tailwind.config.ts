@@ -13,7 +13,6 @@ const config: Config = {
         "table-body": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
         "button-s": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
         "button-m": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
-        "button-l": ["20px", { lineHeight: "1.5", fontWeight: "400" }],
         "modal-title": ["24px", { lineHeight: "1.5", fontWeight: "700" }],
         label: ["14px", { lineHeight: "1.5", fontWeight: "400" }],
         h2: ["24px", { lineHeight: "1.5", fontWeight: "700" }],

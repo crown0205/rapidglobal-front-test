@@ -14,6 +14,7 @@ import Up from "@icons/arrow-up.svg";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import ProductModal from "@/components/Modal/ProductModal";
+import Button from "@/components/atoms/Button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -66,34 +67,6 @@ type IHeaderTitle = {
   styles: string;
 }[];
 
-const headerTitle: IHeaderTitle = [
-  {
-    title: "",
-    order: undefined,
-    styles: "w-full max-w-[120px]",
-  },
-  {
-    title: "상품명",
-    order: "productTitle",
-    styles: "w-full max-w-[320px]",
-  },
-  {
-    title: "가격",
-    order: "price",
-    styles: "w-full max-w-[106px]",
-  },
-  {
-    title: "등록 날짜",
-    order: "uploadedAt",
-    styles: "min-w-[70px] max-w-[100px] break-keep",
-  },
-  {
-    title: "조회수",
-    order: "viewCount",
-    styles: "w-full max-w-[80px]",
-  },
-];
-
 export default function Home() {
   // FIXME : 페이지 네이션 될때 리랜더 되는 부분이 전체적이여서 확인 필요
   // FIXME : sortList 값 incoding 하는 방식 체크해서 더 좋은 방법 찾기
@@ -117,8 +90,9 @@ export default function Home() {
     }
   }, []);
 
-  // NOTE : 데이터 가져오기
-  const { data, error } = useQuery(
+  // TODO : useHook으로 분리하기
+  // api 호출부분 최적화
+  const { data, error, isLoading } = useQuery(
     ["products", page, orderBy, sort],
     async (): Promise<IProduct> => {
       // REVIEW :"/api/product/list?skip=0&take=10&sortList=[{%22viewCount%22:%22desc%22}]"
@@ -183,13 +157,41 @@ export default function Home() {
   const buttonData = [
     {
       title: "정렬 기준 저장",
-      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600 text-button-s",
+      styles: "bg-slate-500 text-white",
       onclick: handleSortSave,
     },
     {
       title: "초기화",
-      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600 text-button-s",
+      styles: "bg-slate-500 text-white",
       onclick: handleSortReset,
+    },
+  ];
+
+  const headerTitle: IHeaderTitle = [
+    {
+      title: "",
+      order: undefined,
+      styles: "w-full max-w-[120px]",
+    },
+    {
+      title: "상품명",
+      order: "productTitle",
+      styles: "w-full max-w-[320px]",
+    },
+    {
+      title: "가격",
+      order: "price",
+      styles: "w-full max-w-[106px]",
+    },
+    {
+      title: "등록 날짜",
+      order: "uploadedAt",
+      styles: "min-w-[70px] max-w-[100px] break-keep",
+    },
+    {
+      title: "조회수",
+      order: "viewCount",
+      styles: "w-full max-w-[80px]",
     },
   ];
 
@@ -211,13 +213,14 @@ export default function Home() {
         {/* NOTE : layout */}
         <div className="flex gap-2 w-[80%] justify-end max-w-">
           {buttonData.map((button) => (
-            <button
+            <Button
               key={button.title}
-              className={button.styles}
+              size="small"
+              style={button.styles}
               onClick={button.onclick}
             >
               {button.title}
-            </button>
+            </Button>
           ))}
         </div>
         <table className="w-[80%]">
@@ -297,27 +300,27 @@ export default function Home() {
               length: Math.ceil(data.totalCount / contentLength),
             }).map((_, index) => {
               return (
-                <button
+                <Button
                   key={index}
-                  className={clsx(
-                    "bg-slate-500 rounded-md px-4 py-2 transition-colors duration-300 ease-in-out text-button-s",
+                  style={clsx(
+                    "bg-slate-500 text-white",
                     index + 1 === page && "bg-slate-700",
                     index + 1 !== page && "hover:bg-slate-600"
                   )}
                   onClick={() => setPate(index + 1)}
                 >
                   {index + 1}
-                </button>
+                </Button>
               );
             })
           ) : (
-            <button
-              className={clsx("bg-slate-500 rounded-md px-4 py-2", {
+            <Button
+              style={clsx("bg-slate-500 text-white", {
                 "bg-slate-300": 1 === page,
               })}
             >
               {page}
-            </button>
+            </Button>
           )}
         </div>
 

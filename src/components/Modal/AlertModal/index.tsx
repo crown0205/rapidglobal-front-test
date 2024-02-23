@@ -1,5 +1,6 @@
 import useGlobalModalStore, { ModalType } from "@/store/modal";
 import BaseModal from "../BaseModal";
+import Button from "@/components/atoms/Button";
 
 export interface AlertModalProps {
   text?: string;
@@ -21,12 +22,14 @@ const AlertModal = ({ text = "text", onConfirm }: AlertModalProps) => {
           {text}
         </div>
         <div className="w-full flex justify-around">
-          <button
-            className="text-black border px-10 py-2 rounded-lg"
+          <Button
+            size="small"
+            isClickEffect={false}
+            style="text-black border hover:bg-gray-100 active:bg-gray-200 transition-all"
             onClick={onConfirm ?? hideGlobalModal}
           >
             확인
-          </button>
+          </Button>
         </div>
       </div>
     </BaseModal>

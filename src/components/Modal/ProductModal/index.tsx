@@ -6,6 +6,8 @@ import BaseModal from "../BaseModal";
 import useGlobalModalStore from "@/store/modal";
 import { useMutation, useQueryClient } from "react-query";
 import { axiosInstance } from "@/network";
+import Button from "@/components/atoms/Button";
+import clsx from "clsx";
 
 interface ProductModalProps {
   isModalState: boolean;
@@ -206,15 +208,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
                     <p className="break-keep text-p">{product?.title}</p>
                   )}
                   {!isEdit && (
-                    <button
-                      className="px-2 py-1 ml-2 border rounded-md min-w-[50px] text-button-s hover:bg-gray-100 transition-all active:bg-gray-200"
+                    <Button
+                      size="small"
+                      isClickEffect={false}
+                      style={clsx(
+                        "px-2 py-1 ml-2 border rounded-md min-w-[50px]",
+                        "hover:bg-gray-100 active:bg-gray-200 transition-all"
+                      )}
                       onClick={() => {
                         setIsEdit(true);
                         setTitle(product?.title ?? "");
                       }}
                     >
                       수정
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -236,21 +243,25 @@ const ProductModal: React.FC<ProductModalProps> = ({
         {/* NOTE : 저장, 취소 버튼 */}
         {isEdit && (
           <div className="flex items-center justify-center gap-[16px]">
-            <button
-              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all text-button-s"
+            <Button
+              size="small"
+              isClickEffect={false}
+              style="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all"
               onClick={() => {
                 setIsEdit(false);
                 setTitle("");
               }}
             >
               취소
-            </button>
-            <button
-              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all text-button-s"
+            </Button>
+            <Button
+              size="small"
+              isClickEffect={false}
+              style="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all"
               onClick={handleSave}
             >
               저장
-            </button>
+            </Button>
           </div>
         )}
       </div>
