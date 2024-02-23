@@ -51,6 +51,8 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const modalContentsStyle = {
     color: "black",
     width: "80%",
+    maxWidth: "800px",
+    minWidth: "500px",
     padding: "2rem",
   };
 
@@ -212,7 +214,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       size="small"
                       isClickEffect={false}
                       style={clsx(
-                        "px-2 py-1 ml-2 border rounded-md min-w-[50px]",
+                        "px-2 py-1 ml-2 border rounded-md min-w-[60px]",
                         "hover:bg-gray-100 active:bg-gray-200 transition-all"
                       )}
                       onClick={() => {

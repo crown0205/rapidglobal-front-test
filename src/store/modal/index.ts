@@ -1,5 +1,5 @@
-import { AlertModalProps } from "@/components/Modal/AlertModal";
-import { ConfirmModalProps } from "@/components/Modal/ConfirmModal";
+import { AlertModalProps } from "@/components/molecules/Modal/AlertModal";
+import { ConfirmModalProps } from "@/components/molecules/Modal/ConfirmModal";
 import { create } from "zustand";
 
 export type ModalType = "ConfirmModal" | "AlertModal" | null;

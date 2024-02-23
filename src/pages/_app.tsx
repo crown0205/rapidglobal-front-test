@@ -1,4 +1,4 @@
-import GlobalModal from "@/components/Modal/GlobalModal";
+import GlobalModal from "@/components/molecules/Modal/GlobalModal";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { useEffect } from "react";

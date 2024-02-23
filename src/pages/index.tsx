@@ -13,7 +13,7 @@ import Down from "@icons/arrow-down.svg";
 import Up from "@icons/arrow-up.svg";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import ProductModal from "@/components/Modal/ProductModal";
+import ProductModal from "@/components/molecules/Modal/ProductModal";
 import Button from "@/components/atoms/Button";
 
 const inter = Inter({ subsets: ["latin"] });
