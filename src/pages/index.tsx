@@ -1,11 +1,199 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import { useQuery } from "react-query";
 
-const inter = Inter({ subsets: ['latin'] })
+import { Inter } from "next/font/google";
+import Head from "next/head";
+import Image from "next/image";
+
+import { axiosInstance } from "@/network";
+// import styles from "@/styles/Home.module.css";
+import { IProduct, Product } from "@dto/product.model.dto";
+
+import useGlobalModalStore from "@/store/modal";
+import Down from "@icons/arrow-down.svg";
+import Up from "@icons/arrow-up.svg";
+import clsx from "clsx";
+import { useEffect, useState } from "react";
+import ProductModal from "@/components/Modal/ProductModal";
+
+const inter = Inter({ subsets: ["latin"] });
+
+// IDEA : next를 이용하는 이유에서 빠른 렌더를 하기 위해서는 어떤 방식을 할지 선택
+// getServerSideProps
+// getStaticProps
+
+// TODO
+// 11. error 처리
+// 12. 반응형 처리
+// 13. refectory ( 코드 정리 )
+//      - 컴포넌트 분리
+//      - 코드 정리
+//        - api 호출 부분
+//      - 주석 정리
+//      - 타입 정리
+//      - css 정리
+//      - 변수명 정리
+//      - 함수명 정리
+//      - 파일명 정리
+//      - 폴더명 정리
+
+// 14. 테스트 코드 작성
+
+// TODO : 컴포넌트 분리
+// button
+// table
+// modal
+// input
+// select ?? 필요한 곳이 있나??
+// image
+// layout
+// card
+// form
+// list
+
+type IOrderBy =
+  | "price"
+  | "productTitle"
+  | "uploadedAt"
+  | "viewCount"
+  | "none"
+  | undefined;
+
+type Sort = "desc" | "asc" | "none";
+
+type IHeaderTitle = {
+  title: string;
+  order: IOrderBy;
+  styles: string;
+}[];
+
+const headerTitle: IHeaderTitle = [
+  {
+    title: "",
+    order: undefined,
+    styles: "w-full max-w-[120px]",
+  },
+  {
+    title: "상품명",
+    order: "productTitle",
+    styles: "w-full max-w-[320px]",
+  },
+  {
+    title: "가격",
+    order: "price",
+    styles: "w-full max-w-[106px]",
+  },
+  {
+    title: "업데이트 일시",
+    order: "uploadedAt",
+    styles: "min-w-[70px] max-w-[100px] break-keep",
+  },
+  {
+    title: "조회수",
+    order: "viewCount",
+    styles: "w-full max-w-[80px]",
+  },
+];
 
 export default function Home() {
+  // FIXME : 페이지 네이션 될때 리랜더 되는 부분이 전체적이여서 확인 필요
+  // FIXME : sortList 값 incoding 하는 방식 체크해서 더 좋은 방법 찾기
+  // FIXME : 정렬 아이콘 위치 수정하기
+  // FIXME : 상품명 수정후 상품명을 수정하지 않고 다시 저장하면 수정요청이 정상적으로 되는 부분 고치기
+
+  // NOTE : 콘텐츠 갯수 => 추후에 useState로 관리
+  // TODO : take => limit ( contentLength ) => 한번에 보여줄 갯수
+
+  const contentLength = 10;
+  const [page, setPate] = useState(1);
+  const [orderBy, setOrderBy] = useState<IOrderBy>("none");
+  const [sort, setSort] = useState<Sort>("none");
+  const [isModalState, setIsModalState] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
+
+  // NOTE : 정렬 기준 저장
+  useEffect(() => {
+    if (localStorage.getItem("orderBy")) {
+      setOrderBy(localStorage.getItem("orderBy") as IOrderBy);
+      setSort(localStorage.getItem("sort") as Sort);
+    }
+  }, []);
+
+  // NOTE : 데이터 가져오기
+  const { data, error } = useQuery(
+    ["products", page, orderBy, sort],
+    async (): Promise<IProduct> => {
+      // REVIEW :"/api/product/list?skip=0&take=10&sortList=[{%22viewCount%22:%22desc%22}]"
+      // FIXME : api url을 어떻게 관리할지 확인 필요 ( 최적화 필요 )
+      const { data } = await axiosInstance(
+        `/api/product/list?skip=${
+          (page - 1) * contentLength
+        }&take=${contentLength}${
+          orderBy !== "none" ? `&sortList=[{"${orderBy}":"${sort}"}]` : ""
+        }`
+      );
+      const { productList, totalCount } = data;
+      return { productList, totalCount: totalCount ?? 1 };
+    },
+    {
+      onError: (error) => {
+        console.error(error);
+      },
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const handleSort = (newOrderBy: IOrderBy) => {
+    if (orderBy !== newOrderBy) {
+      setSort("desc");
+      setOrderBy(newOrderBy);
+    } else {
+      setSort((prevSort) => {
+        if (prevSort === "none") return "desc";
+        if (prevSort === "desc") return "asc";
+        return "none";
+      });
+
+      if (sort === "asc") {
+        setOrderBy("none");
+      }
+    }
+  };
+
+  const handleSortSave = () => {
+    if (orderBy && orderBy !== "none" && sort !== "none") {
+      // FIXME : 저장 하는 방식 수정하기
+      // {orderBy: "price", sort: "desc"}
+      // sortBy : {orderBy: "price", sort: "desc"} 이렇게 localStorage에 저장
+      localStorage.setItem("orderBy", orderBy);
+      localStorage.setItem("sort", sort);
+    }
+  };
+
+  const handleSortReset = () => {
+    if (localStorage.getItem("orderBy")) {
+      localStorage.removeItem("orderBy");
+      localStorage.removeItem("sort");
+    }
+
+    if (orderBy !== "none" || sort !== "none") {
+      setOrderBy("none");
+      setSort("none");
+    }
+  };
+
+  const buttonData = [
+    {
+      title: "정렬 기준 저장",
+      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600",
+      onclick: handleSortSave,
+    },
+    {
+      title: "초기화",
+      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600",
+      onclick: handleSortReset,
+    },
+  ];
+
   return (
     <>
       <Head>
@@ -14,101 +202,129 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+
+      <main
+        className={clsx(
+          `px-6 py-4 w-full h-full flex flex-col gap-[20px] items-center justify-center`,
+          inter.className
+        )}
+      >
+        {/* NOTE : layout */}
+        <div className="flex gap-2 w-[80%] justify-end max-w-">
+          {buttonData.map((button) => (
+            <button
+              key={button.title}
+              className={button.styles}
+              onClick={button.onclick}
             >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
+              {button.title}
+            </button>
+          ))}
+        </div>
+        <table className="w-[80%]">
+          {/* 정렬을 위한 테이블 헤더와 onClick */}
+          <thead className="flex w-full">
+            <tr className="flex justify-between text-center w-full ">
+              {headerTitle.map(({ title, order, styles }) => (
+                <th
+                  key={title}
+                  className={`mb-8 cursor-pointer ${styles}`}
+                  onClick={() => {
+                    if (order !== undefined) handleSort(order);
+                  }}
+                >
+                  <span className="relative">
+                    {title}
+                    {orderBy === order && (
+                      <span className="absolute top-0 left-12">
+                        {sort === "desc" ? <Up /> : <Down />}
+                      </span>
+                    )}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody className="flex flex-col overflow-y-auto h-[900px]">
+            {data?.productList.map((product: Product) => {
+              const updatedAt = new Date(
+                product.uploadedAt
+              ).toLocaleDateString();
+              return (
+                <tr
+                  key={product.id}
+                  className="text-center bg-slate-500 rounded-xl mb-2 cursor-pointer p-4 flex gap-4 items-center justify-between hover:bg-slate-600 transition-colors duration-300 ease-in-out"
+                  onClick={() => {
+                    // NOTE : 상품 클릭시 상세 모달 띄우기
+                    setIsModalState(true);
+                    setProduct(product);
+                  }}
+                >
+                  <td className="">
+                    <Image
+                      className="rounded-2xl"
+                      src={product.thumbnailUrls[0]}
+                      alt={product.title}
+                      width={100}
+                      height={100}
+                      priority={true}
+                    />
+                  </td>
+                  <td className="w-[310px] break-keep">{product.title}</td>
+                  <td className="">{product.price.toLocaleString("kor")}원</td>
+                  <td className="">{updatedAt}</td>
+                  <td className="min-w-[40px]">{product.viewCount}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {/* TODO 
+            페이지 네이션을 위한 컴포넌트를 만들어야 함 
+            데이터의 총 갯수와 페이지당 보여줄 갯수를 받아서 페이지네이션을 만들어야 함 
+            해당 페이지 활성화 효과 주기 
+        */}
+        <div className="flex gap-2 justify-end w-[80%]">
+          {/* totalCount와 contentLength값으로 몇개의 페이지가 나오는지 구하기 */}
+          {data ? (
+            Array.from({
+              length: Math.ceil(data.totalCount / contentLength),
+            }).map((_, index) => {
+              return (
+                <button
+                  key={index}
+                  className={clsx(
+                    "bg-slate-500 rounded-md px-4 py-2 transition-colors duration-300 ease-in-out",
+                    index + 1 === page && "bg-slate-700",
+                    index + 1 !== page && "hover:bg-slate-600"
+                  )}
+                  onClick={() => setPate(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              );
+            })
+          ) : (
+            <button
+              className={clsx("bg-slate-500 rounded-md px-4 py-2", {
+                "bg-slate-300": 1 === page,
+              })}
+            >
+              {page}
+            </button>
+          )}
         </div>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        {/* NOTE : ITEM MODAL */}
+        <ProductModal
+          isModalState={isModalState}
+          product={product}
+          onClose={() => {
+            setIsModalState(false);
+          }}
+        />
       </main>
     </>
-  )
+  );
 }

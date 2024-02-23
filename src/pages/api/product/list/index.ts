@@ -1,13 +1,13 @@
-import { Product } from "@dto/product.model.dto";
+import { IProduct, Product } from "@dto/product.model.dto";
 import dayjs from "dayjs";
 import { readFileSync } from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-//http://localhost:3000/api/product/list?skip=0&take=10&sortList=[{%22price%22:%22desc%22}]
+// GET http://localhost:3000/api/product/list?skip=0&take=10&sortList=[{%22price%22:%22desc%22}]
 
 export default function GET(
   req: NextApiRequest,
-  res: NextApiResponse<Product[]>
+  res: NextApiResponse<IProduct>
 ) {
   const {
     skip: skipQuery = "0",
@@ -53,7 +53,12 @@ export default function GET(
     })
     .slice(skip, skip + take);
 
-  res.status(200).json(sortProductList);
+  const customProductList = {
+    productList: [...sortProductList],
+    totalCount: productList.length ?? 0,
+  };
+
+  res.status(200).json(customProductList);
 }
 
 function sortByPrice(a: Product, b: Product) {
@@ -67,6 +72,7 @@ function sortByTitle(a: Product, b: Product) {
 function sortByUploadedAt(a: Product, b: Product) {
   return dayjs(b.uploadedAt).diff(dayjs(a.uploadedAt), "days");
 }
+
 function sortByViewCount(a: Product, b: Product) {
   return b.viewCount - a.viewCount;
 }
