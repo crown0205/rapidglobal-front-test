@@ -147,13 +147,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
     >
       {/* NOTE : title 영역 */}
       <div className="flex justify-between">
-        <h1 className="text-2xl px-2">상품 상세</h1>
+        <h1 className="text-2xl px-2 text-modal-title">상품 상세</h1>
         <Close className="cursor-pointer " onClick={handleCloseModal} />
       </div>
 
       {/* NOTE : 컨텐츠 영역 */}
-      <div className="flex flex-col gap-[50px]">
-        <div className="flex gap-10 pt-8">
+      <div className="flex flex-col gap-[50px] pt-6">
+        <div className="flex gap-10">
           <div>
             <Image
               src={product?.thumbnailUrls[0] ?? ""}
@@ -191,11 +191,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
           <div className="flex flex-col gap-3 w-full max-w-[60%]">
             <div className="flex items-end w-full">
               <div className="flex flex-col w-full">
-                <p className="text-gray-500 text-sm">상품명</p>
+                <p className="text-gray-500 text-label">상품명</p>
                 <div className="flex w-full justify-between items-center">
                   {isEdit ? (
                     <input
-                      className="bg-white border border-gray-400 rounded-sm w-[100%] px-2"
+                      className="bg-white border border-gray-400 rounded-sm w-[100%] px-2 text-p"
                       type="text"
                       value={title}
                       onChange={(e) => {
@@ -203,11 +203,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
                       }}
                     />
                   ) : (
-                    <p className="break-keep">{product?.title}</p>
+                    <p className="break-keep text-p">{product?.title}</p>
                   )}
                   {!isEdit && (
                     <button
-                      className="px-2 py-1 ml-2 border rounded-md min-w-[50px] text-sm hover:bg-gray-100 transition-all active:bg-gray-200"
+                      className="px-2 py-1 ml-2 border rounded-md min-w-[50px] text-button-s hover:bg-gray-100 transition-all active:bg-gray-200"
                       onClick={() => {
                         setIsEdit(true);
                         setTitle(product?.title ?? "");
@@ -220,16 +220,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
               </div>
             </div>
             <div className="flex flex-col">
-              <p className="text-gray-500 text-sm">가격</p>
-              <p>{product?.price.toLocaleString("kor")}원</p>
+              <p className="text-gray-500 text-label">가격</p>
+              <p className="text-p">{product?.price.toLocaleString("kor")}원</p>
             </div>
             <div className="flex flex-col">
-              <p className="text-gray-500 text-sm">등록 날짜</p>
-              <p>{updatedAt}</p>
+              <p className="text-gray-500 text-label">등록 날짜</p>
+              <p className="text-p">{updatedAt}</p>
             </div>
             <div className="flex flex-col">
-              <p className="text-gray-500 text-sm">조회수</p>
-              <p>{product?.viewCount}</p>
+              <p className="text-gray-500 text-label">조회수</p>
+              <p className="text-p">{product?.viewCount}</p>
             </div>
           </div>
         </div>
@@ -237,7 +237,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
         {isEdit && (
           <div className="flex items-center justify-center gap-[16px]">
             <button
-              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all"
+              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all text-button-s"
               onClick={() => {
                 setIsEdit(false);
                 setTitle("");
@@ -246,7 +246,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               취소
             </button>
             <button
-              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all"
+              className="border px-5 py-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-all text-button-s"
               onClick={handleSave}
             >
               저장

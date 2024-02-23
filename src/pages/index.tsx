@@ -83,7 +83,7 @@ const headerTitle: IHeaderTitle = [
     styles: "w-full max-w-[106px]",
   },
   {
-    title: "업데이트 일시",
+    title: "등록 날짜",
     order: "uploadedAt",
     styles: "min-w-[70px] max-w-[100px] break-keep",
   },
@@ -98,7 +98,6 @@ export default function Home() {
   // FIXME : 페이지 네이션 될때 리랜더 되는 부분이 전체적이여서 확인 필요
   // FIXME : sortList 값 incoding 하는 방식 체크해서 더 좋은 방법 찾기
   // FIXME : 정렬 아이콘 위치 수정하기
-  // FIXME : 상품명 수정후 상품명을 수정하지 않고 다시 저장하면 수정요청이 정상적으로 되는 부분 고치기
 
   // NOTE : 콘텐츠 갯수 => 추후에 useState로 관리
   // TODO : take => limit ( contentLength ) => 한번에 보여줄 갯수
@@ -184,12 +183,12 @@ export default function Home() {
   const buttonData = [
     {
       title: "정렬 기준 저장",
-      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600",
+      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600 text-button-s",
       onclick: handleSortSave,
     },
     {
       title: "초기화",
-      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600",
+      styles: "bg-slate-500 p-2 rounded hover:bg-slate-600 text-button-s",
       onclick: handleSortReset,
     },
   ];
@@ -233,7 +232,7 @@ export default function Home() {
                     if (order !== undefined) handleSort(order);
                   }}
                 >
-                  <span className="relative">
+                  <span className="relative text-table-header">
                     {title}
                     {orderBy === order && (
                       <span className="absolute top-0 left-12">
@@ -271,10 +270,16 @@ export default function Home() {
                       priority={true}
                     />
                   </td>
-                  <td className="w-[310px] break-keep">{product.title}</td>
-                  <td className="">{product.price.toLocaleString("kor")}원</td>
-                  <td className="">{updatedAt}</td>
-                  <td className="min-w-[40px]">{product.viewCount}</td>
+                  <td className="w-[310px] break-keep text-table-body">
+                    {product.title}
+                  </td>
+                  <td className="text-table-body">
+                    {product.price.toLocaleString("kor")}원
+                  </td>
+                  <td className="text-table-body">{updatedAt}</td>
+                  <td className="min-w-[40px] text-table-body">
+                    {product.viewCount}
+                  </td>
                 </tr>
               );
             })}
@@ -295,7 +300,7 @@ export default function Home() {
                 <button
                   key={index}
                   className={clsx(
-                    "bg-slate-500 rounded-md px-4 py-2 transition-colors duration-300 ease-in-out",
+                    "bg-slate-500 rounded-md px-4 py-2 transition-colors duration-300 ease-in-out text-button-s",
                     index + 1 === page && "bg-slate-700",
                     index + 1 !== page && "hover:bg-slate-600"
                   )}
