@@ -11,10 +11,6 @@ import { useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// IDEA : next를 이용하는 이유에서 빠른 렌더를 하기 위해서는 어떤 방식을 할지 선택
-// getServerSideProps
-// getStaticProps
-
 export type IOrderBy =
   | "price"
   | "productTitle"
