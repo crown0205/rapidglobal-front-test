@@ -2,19 +2,18 @@ import { useQuery } from "react-query";
 
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import Image from "next/image";
 
 import { axiosInstance } from "@/network";
 // import styles from "@/styles/Home.module.css";
 import { IProduct, Product } from "@dto/product.model.dto";
 
 import useGlobalModalStore from "@/store/modal";
-import Down from "@icons/arrow-down.svg";
-import Up from "@icons/arrow-up.svg";
+
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import ProductModal from "@/components/molecules/Modal/ProductModal";
 import Button from "@/components/atoms/Button";
+import ProductTable from "@/components/molecules/ProductTable";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -51,7 +50,7 @@ const inter = Inter({ subsets: ["latin"] });
 // form
 // list
 
-type IOrderBy =
+export type IOrderBy =
   | "price"
   | "productTitle"
   | "uploadedAt"
@@ -59,13 +58,7 @@ type IOrderBy =
   | "none"
   | undefined;
 
-type Sort = "desc" | "asc" | "none";
-
-type IHeaderTitle = {
-  title: string;
-  order: IOrderBy;
-  styles: string;
-}[];
+export type Sort = "desc" | "asc" | "none";
 
 export default function Home() {
   // FIXME : 페이지 네이션 될때 리랜더 되는 부분이 전체적이여서 확인 필요
@@ -92,7 +85,11 @@ export default function Home() {
 
   // TODO : useHook으로 분리하기
   // api 호출부분 최적화
-  const { data, error, isLoading } = useQuery(
+  const {
+    data: productListData,
+    error,
+    isLoading,
+  } = useQuery(
     ["products", page, orderBy, sort],
     async (): Promise<IProduct> => {
       // REVIEW :"/api/product/list?skip=0&take=10&sortList=[{%22viewCount%22:%22desc%22}]"
@@ -114,23 +111,6 @@ export default function Home() {
       refetchOnWindowFocus: false,
     }
   );
-
-  const handleSort = (newOrderBy: IOrderBy) => {
-    if (orderBy !== newOrderBy) {
-      setSort("desc");
-      setOrderBy(newOrderBy);
-    } else {
-      setSort((prevSort) => {
-        if (prevSort === "none") return "desc";
-        if (prevSort === "desc") return "asc";
-        return "none";
-      });
-
-      if (sort === "asc") {
-        setOrderBy("none");
-      }
-    }
-  };
 
   const handleSortSave = () => {
     if (orderBy && orderBy !== "none" && sort !== "none") {
@@ -167,34 +147,6 @@ export default function Home() {
     },
   ];
 
-  const headerTitle: IHeaderTitle = [
-    {
-      title: "",
-      order: undefined,
-      styles: "w-full max-w-[120px]",
-    },
-    {
-      title: "상품명",
-      order: "productTitle",
-      styles: "w-full max-w-[320px]",
-    },
-    {
-      title: "가격",
-      order: "price",
-      styles: "w-full max-w-[106px]",
-    },
-    {
-      title: "등록 날짜",
-      order: "uploadedAt",
-      styles: "min-w-[70px] max-w-[100px] break-keep",
-    },
-    {
-      title: "조회수",
-      order: "viewCount",
-      styles: "w-full max-w-[80px]",
-    },
-  ];
-
   return (
     <>
       <Head>
@@ -223,71 +175,17 @@ export default function Home() {
             </Button>
           ))}
         </div>
-        <table className="w-[80%]">
-          {/* 정렬을 위한 테이블 헤더와 onClick */}
-          <thead className="flex w-full">
-            <tr className="flex justify-between text-center w-full ">
-              {headerTitle.map(({ title, order, styles }) => (
-                <th
-                  key={title}
-                  className={`mb-8 cursor-pointer ${styles}`}
-                  onClick={() => {
-                    if (order !== undefined) handleSort(order);
-                  }}
-                >
-                  <span className="relative text-table-header">
-                    {title}
-                    {orderBy === order && (
-                      <span className="absolute top-0 left-12">
-                        {sort === "desc" ? <Up /> : <Down />}
-                      </span>
-                    )}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
 
-          <tbody className="flex flex-col overflow-y-auto h-[900px]">
-            {data?.productList.map((product: Product) => {
-              const updatedAt = new Date(
-                product.uploadedAt
-              ).toLocaleDateString();
-              return (
-                <tr
-                  key={product.id}
-                  className="text-center bg-slate-500 rounded-xl mb-2 cursor-pointer p-4 flex gap-4 items-center justify-between hover:bg-slate-600 transition-colors duration-300 ease-in-out"
-                  onClick={() => {
-                    // NOTE : 상품 클릭시 상세 모달 띄우기
-                    setIsModalState(true);
-                    setProduct(product);
-                  }}
-                >
-                  <td className="">
-                    <Image
-                      className="rounded-2xl"
-                      src={product.thumbnailUrls[0]}
-                      alt={product.title}
-                      width={100}
-                      height={100}
-                      priority={true}
-                    />
-                  </td>
-                  <td className="w-[310px] break-keep text-table-body">
-                    {product.title}
-                  </td>
-                  <td className="text-table-body">
-                    {product.price.toLocaleString("kor")}원
-                  </td>
-                  <td className="text-table-body">{updatedAt}</td>
-                  <td className="min-w-[40px] text-table-body">
-                    {product.viewCount}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <ProductTable
+          sort={sort}
+          setSort={setSort}
+          orderBy={orderBy}
+          setOrderBy={setOrderBy}
+          data={productListData}
+          setProduct={setProduct}
+          setIsModalState={setIsModalState}
+        />
+
         {/* TODO 
             페이지 네이션을 위한 컴포넌트를 만들어야 함 
             데이터의 총 갯수와 페이지당 보여줄 갯수를 받아서 페이지네이션을 만들어야 함 
@@ -295,9 +193,9 @@ export default function Home() {
         */}
         <div className="flex gap-2 justify-end w-[80%]">
           {/* totalCount와 contentLength값으로 몇개의 페이지가 나오는지 구하기 */}
-          {data ? (
+          {productListData ? (
             Array.from({
-              length: Math.ceil(data.totalCount / contentLength),
+              length: Math.ceil(productListData.totalCount / contentLength),
             }).map((_, index) => {
               return (
                 <Button

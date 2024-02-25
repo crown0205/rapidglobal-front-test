@@ -1,13 +1,13 @@
-import Close from "@icons/close.svg";
-import { Product } from "@dto/product.model.dto";
-import Image from "next/image";
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import BaseModal from "../BaseModal";
-import useGlobalModalStore from "@/store/modal";
-import { useMutation, useQueryClient } from "react-query";
-import { axiosInstance } from "@/network";
 import Button from "@/components/atoms/Button";
+import { axiosInstance } from "@/network";
+import useGlobalModalStore from "@/store/modal";
+import { Product } from "@dto/product.model.dto";
+import Close from "@icons/close.svg";
 import clsx from "clsx";
+import Image from "next/image";
+import React, { useState } from "react";
+import { useMutation, useQueryClient } from "react-query";
+import BaseModal from "../BaseModal";
 
 interface ProductModalProps {
   isModalState: boolean;
