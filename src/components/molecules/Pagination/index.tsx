@@ -1,9 +1,10 @@
 import Button from "@/components/atoms/Button";
+import { IProduct } from "@dto/product.model.dto";
 import clsx from "clsx";
 import React from "react";
 
 interface PaginationProps {
-  productListData: any;
+  productListData?: IProduct;
   contentLength: number;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;

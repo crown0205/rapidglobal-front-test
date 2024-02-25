@@ -1,55 +1,19 @@
-import { useQuery } from "react-query";
-
+import Button from "@/components/atoms/Button";
+import ProductModal from "@/components/molecules/Modal/ProductModal";
+import Pagination from "@/components/molecules/Pagination";
+import ProductTable from "@/components/molecules/ProductTable";
+import { useProducts } from "@/hook/useProducts";
+import { Product } from "@dto/product.model.dto";
+import clsx from "clsx";
 import { Inter } from "next/font/google";
 import Head from "next/head";
-
-import { axiosInstance } from "@/network";
-// import styles from "@/styles/Home.module.css";
-import { IProduct, Product } from "@dto/product.model.dto";
-
-import useGlobalModalStore from "@/store/modal";
-
-import clsx from "clsx";
-import { SetStateAction, useEffect, useState } from "react";
-import ProductModal from "@/components/molecules/Modal/ProductModal";
-import Button from "@/components/atoms/Button";
-import ProductTable from "@/components/molecules/ProductTable";
-import Pagination from "@/components/molecules/Pagination";
+import { useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 // IDEA : next를 이용하는 이유에서 빠른 렌더를 하기 위해서는 어떤 방식을 할지 선택
 // getServerSideProps
 // getStaticProps
-
-// TODO
-// 11. error 처리
-// 12. 반응형 처리
-// 13. refectory ( 코드 정리 )
-//      - 컴포넌트 분리
-//      - 코드 정리
-//        - api 호출 부분
-//      - 주석 정리
-//      - 타입 정리
-//      - css 정리
-//      - 변수명 정리
-//      - 함수명 정리
-//      - 파일명 정리
-//      - 폴더명 정리
-
-// 14. 테스트 코드 작성
-
-// TODO : 컴포넌트 분리
-// button
-// table
-// modal
-// input
-// select ?? 필요한 곳이 있나??
-// image
-// layout
-// card
-// form
-// list
 
 export type IOrderBy =
   | "price"
@@ -76,7 +40,6 @@ export default function Home() {
   const [isModalState, setIsModalState] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
 
-  // NOTE : 정렬 기준 저장
   useEffect(() => {
     if (localStorage.getItem("orderBy")) {
       setOrderBy(localStorage.getItem("orderBy") as IOrderBy);
@@ -84,40 +47,17 @@ export default function Home() {
     }
   }, []);
 
-  // TODO : useHook으로 분리하기
-  // api 호출부분 최적화
-  const {
-    data: productListData,
-    error,
-    isLoading,
-  } = useQuery(
-    ["products", page, orderBy, sort],
-    async (): Promise<IProduct> => {
-      // REVIEW :"/api/product/list?skip=0&take=10&sortList=[{%22viewCount%22:%22desc%22}]"
-      // FIXME : api url을 어떻게 관리할지 확인 필요 ( 최적화 필요 )
-      const { data } = await axiosInstance(
-        `/api/product/list?skip=${
-          (page - 1) * contentLength
-        }&take=${contentLength}${
-          orderBy !== "none" ? `&sortList=[{"${orderBy}":"${sort}"}]` : ""
-        }`
-      );
-      const { productList, totalCount } = data;
-      return { productList, totalCount: totalCount ?? 1 };
-    },
-    {
-      onError: (error) => {
-        console.error(error);
-      },
-      refetchOnWindowFocus: false,
-    }
-  );
+  const { data: productListData, isLoading } = useProducts({
+    page,
+    orderBy,
+    sort,
+    contentLength,
+  });
+
+  console.log(productListData);
 
   const handleSortSave = () => {
     if (orderBy && orderBy !== "none" && sort !== "none") {
-      // FIXME : 저장 하는 방식 수정하기
-      // {orderBy: "price", sort: "desc"}
-      // sortBy : {orderBy: "price", sort: "desc"} 이렇게 localStorage에 저장
       localStorage.setItem("orderBy", orderBy);
       localStorage.setItem("sort", sort);
     }
@@ -185,6 +125,7 @@ export default function Home() {
           data={productListData}
           setProduct={setProduct}
           setIsModalState={setIsModalState}
+          isLoading={isLoading}
         />
 
         <Pagination
