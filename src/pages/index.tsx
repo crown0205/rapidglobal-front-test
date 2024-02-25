@@ -14,6 +14,7 @@ import { SetStateAction, useEffect, useState } from "react";
 import ProductModal from "@/components/molecules/Modal/ProductModal";
 import Button from "@/components/atoms/Button";
 import ProductTable from "@/components/molecules/ProductTable";
+import Pagination from "@/components/molecules/Pagination";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -69,7 +70,7 @@ export default function Home() {
   // TODO : take => limit ( contentLength ) => 한번에 보여줄 갯수
 
   const contentLength = 10;
-  const [page, setPate] = useState(1);
+  const [page, setPage] = useState(1);
   const [orderBy, setOrderBy] = useState<IOrderBy>("none");
   const [sort, setSort] = useState<Sort>("none");
   const [isModalState, setIsModalState] = useState(false);
@@ -186,41 +187,12 @@ export default function Home() {
           setIsModalState={setIsModalState}
         />
 
-        {/* TODO 
-            페이지 네이션을 위한 컴포넌트를 만들어야 함 
-            데이터의 총 갯수와 페이지당 보여줄 갯수를 받아서 페이지네이션을 만들어야 함 
-            해당 페이지 활성화 효과 주기 
-        */}
-        <div className="flex gap-2 justify-end w-[80%]">
-          {/* totalCount와 contentLength값으로 몇개의 페이지가 나오는지 구하기 */}
-          {productListData ? (
-            Array.from({
-              length: Math.ceil(productListData.totalCount / contentLength),
-            }).map((_, index) => {
-              return (
-                <Button
-                  key={index}
-                  style={clsx(
-                    "bg-slate-500 text-white",
-                    index + 1 === page && "bg-slate-700",
-                    index + 1 !== page && "hover:bg-slate-600"
-                  )}
-                  onClick={() => setPate(index + 1)}
-                >
-                  {index + 1}
-                </Button>
-              );
-            })
-          ) : (
-            <Button
-              style={clsx("bg-slate-500 text-white", {
-                "bg-slate-300": 1 === page,
-              })}
-            >
-              {page}
-            </Button>
-          )}
-        </div>
+        <Pagination
+          productListData={productListData}
+          page={page}
+          setPage={setPage}
+          contentLength={contentLength}
+        />
 
         {/* NOTE : ITEM MODAL */}
         <ProductModal
