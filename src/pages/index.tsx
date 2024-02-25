@@ -26,13 +26,7 @@ export type IOrderBy =
 export type Sort = "desc" | "asc" | "none";
 
 export default function Home() {
-  // FIXME : 페이지 네이션 될때 리랜더 되는 부분이 전체적이여서 확인 필요
-  // FIXME : sortList 값 incoding 하는 방식 체크해서 더 좋은 방법 찾기
   // FIXME : 정렬 아이콘 위치 수정하기
-
-  // NOTE : 콘텐츠 갯수 => 추후에 useState로 관리
-  // TODO : take => limit ( contentLength ) => 한번에 보여줄 갯수
-
   const contentLength = 10;
   const [page, setPage] = useState(1);
   const [orderBy, setOrderBy] = useState<IOrderBy>("none");
@@ -53,8 +47,6 @@ export default function Home() {
     sort,
     contentLength,
   });
-
-  console.log(productListData);
 
   const handleSortSave = () => {
     if (orderBy && orderBy !== "none" && sort !== "none") {
@@ -103,8 +95,7 @@ export default function Home() {
           inter.className
         )}
       >
-        {/* NOTE : layout */}
-        <div className="flex gap-2 w-[80%] justify-end max-w-">
+        <div className="flex gap-2 w-[90%] justify-end max-w-">
           {buttonData.map((button) => (
             <Button
               key={button.title}
@@ -135,7 +126,6 @@ export default function Home() {
           contentLength={contentLength}
         />
 
-        {/* NOTE : ITEM MODAL */}
         <ProductModal
           isModalState={isModalState}
           product={product}

@@ -2,6 +2,7 @@ import { IOrderBy, Sort } from "@/pages";
 import { IProduct, Product } from "@dto/product.model.dto";
 import Down from "@icons/arrow-down.svg";
 import Up from "@icons/arrow-up.svg";
+import clsx from "clsx";
 import Image from "next/image";
 import React from "react";
 
@@ -15,7 +16,7 @@ const headerTitle: IHeaderTitle = [
   {
     title: "",
     order: undefined,
-    styles: "w-full max-w-[120px]",
+    styles: "w-full max-w-[120px] cursor-default",
   },
   {
     title: "상품명",
@@ -28,9 +29,9 @@ const headerTitle: IHeaderTitle = [
     styles: "w-full max-w-[106px]",
   },
   {
-    title: "등록 날짜",
+    title: "등록날짜",
     order: "uploadedAt",
-    styles: "min-w-[70px] max-w-[100px] break-keep",
+    styles: "min-w-[80px] max-w-[100px] break-keep",
   },
   {
     title: "조회수",
@@ -83,25 +84,28 @@ const ProductTable: React.FC<ProductTableProps> = ({
   };
 
   return (
-    <table className="w-[80%]">
+    <table className="w-[90%]">
       {/* 정렬을 위한 테이블 헤더와 onClick */}
       <thead className="flex w-full">
-        <tr className="flex justify-between text-center w-full ">
+        <tr className="flex justify-between text-center w-full">
           {headerTitle.map(({ title, order, styles }) => (
             <th
               key={title}
               className={`mb-8 cursor-pointer ${styles}`}
               onClick={() => {
-                if (order !== undefined) handleSort(order);
+                if (order !== undefined && !isLoading) handleSort(order);
               }}
             >
-              <span className="relative text-table-header">
+              <span className="flex justify-center items-center gap-1">
                 {title}
-                {orderBy === order && (
-                  <span className="absolute top-0 left-12">
-                    {sort === "desc" ? <Up /> : <Down />}
-                  </span>
-                )}
+
+                <span
+                  className={clsx(
+                    orderBy === order ? "opacity-100" : "opacity-0"
+                  )}
+                >
+                  {sort === "desc" ? <Up /> : <Down />}
+                </span>
               </span>
             </th>
           ))}

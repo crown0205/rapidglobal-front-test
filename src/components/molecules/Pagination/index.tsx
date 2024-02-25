@@ -17,7 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
   setPage,
 }) => {
   return (
-    <div className="flex gap-2 justify-end w-[80%]">
+    <div className="flex gap-2 justify-end w-[100%] max-w-[90%] min-w-[50%]">
       {productListData ? (
         Array.from({
           length: Math.ceil(productListData.totalCount / contentLength),
@@ -25,6 +25,7 @@ const Pagination: React.FC<PaginationProps> = ({
           return (
             <Button
               key={index}
+              size="small"
               style={clsx(
                 "bg-slate-500 text-white",
                 index + 1 === page && "bg-slate-700",
