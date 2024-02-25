@@ -26,7 +26,6 @@ export type IOrderBy =
 export type Sort = "desc" | "asc" | "none";
 
 export default function Home() {
-  // FIXME : 정렬 아이콘 위치 수정하기
   const contentLength = 10;
   const [page, setPage] = useState(1);
   const [orderBy, setOrderBy] = useState<IOrderBy>("none");

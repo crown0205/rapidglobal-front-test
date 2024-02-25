@@ -85,7 +85,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   return (
     <table className="w-[90%]">
-      {/* 정렬을 위한 테이블 헤더와 onClick */}
       <thead className="flex w-full">
         <tr className="flex justify-between text-center w-full">
           {headerTitle.map(({ title, order, styles }) => (
